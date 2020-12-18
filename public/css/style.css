@@ -1,0 +1,87 @@
+/* Navbar */
+
+.navbar-brand {
+    font-family: Viga;
+    font-size: 32px;
+}
+
+/* Utility */
+.tombol {
+    text-transform: uppercase;
+    border-radius: 40px;
+}
+
+/* Jumbotron */
+.jumbotron {
+    background-image: url(../assets/img/banner-real.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: 50%;
+    height: 400px;
+}
+
+/* Style all font awesome icons */
+.fa {
+    padding: 10px;
+    font-size: 30px;
+    width: 50px;
+    text-align: center;
+    text-decoration: none;
+    margin-top: -10px;
+    border-radius: 10px;
+  }
+  
+  /* Add a hover effect if you want */
+  .fa:hover {
+    opacity: 1;
+  }
+  
+  /* Set a specific color for each brand */
+  
+  /* Facebook */
+  .fa-facebook {
+    background: #3B5998;
+    color: white;
+  }
+
+.tulisan {
+    margin-top: 100px;
+    margin-left: 10px;
+    font-weight: bold;
+}
+
+.alamatweb {
+    font-size: smaller;
+    margin-left: 80px;
+    color: grey;
+}
+
+.alamatweb:hover{
+    color: grey;
+}
+
+/* Desktop Version */
+@media (min-width: 992px){
+    .navbar-brand, .nav-link {
+        /* color: white !important; */
+        text-shadow: rgba(0, 0, 0, 0.7);
+    }
+    .nav-link {
+        text-transform: uppercase;
+        margin-right: 30px;
+    }
+
+    .nav-link:hover::after {
+        content: '';
+        display: block;
+        border-bottom: 3px solid #0B63DC;
+        width: 50%;
+        margin: auto;
+        padding-bottom: 5px;
+        margin-bottom: -8px;
+    }
+
+    .alamatweb {
+        margin-left: 600px;
+    }
+}
