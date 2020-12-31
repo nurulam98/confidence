@@ -25,11 +25,11 @@ class CouponImport implements ToModel, WithBatchInserts
 
     public function batchSize(): int
     {
-        return 1000;
+        return 100;
     }
 
     public function chunkSize(): int
     {
-        return 1000;
+        return 100;
     }
 }
