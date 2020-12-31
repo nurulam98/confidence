@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Coupon;
@@ -24,7 +23,7 @@ class ITController extends Controller
     public function index(){
         $active = User::where('isDeleted',0)->count();
         $passive = User::where('isDeleted',1)->count();
-        $new = Coupon::where('status','new')->count();
+        $new = Coupon::where('status','Valid')->count();
         $used = Coupon::where('status','used')->count();
         return view('it.dashboard', ['user' => $active, 'couponNew' => $new, 'couponUsed' => $used]);
     }
@@ -159,7 +158,7 @@ class ITController extends Controller
     }
 
     public function couponJson(){
-        $coupon = Coupon::select('coupon', 'status','user_id','created_at')->limit(1000)->get();
+        $coupon = Coupon::select('coupon', 'status','user_id','created_at')->limit(4000)->get();
 
         return datatables()->of($coupon)->addColumn('tanggal',function ($row){
             $tanggal = date_format($row->created_at,"d-m-Y");
