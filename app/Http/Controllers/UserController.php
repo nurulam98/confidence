@@ -19,7 +19,6 @@ class UserController extends Controller
 
     public function index()
     {
-        $coupon = Coupon::where('user_id',Auth::user()->id)->count();
         $points = Points::where('user_id',Auth::user()->id)->first();
         if (strlen($points) == 0){
             $point = 0;
@@ -27,7 +26,7 @@ class UserController extends Controller
         else{
             $point = $points->points;
         }
-        return view('user.dashboard', ['coupon' => $coupon, 'points' => $point]);
+        return view('user.dashboard', ['points' => $point]);
     }
 
     public function profile()
