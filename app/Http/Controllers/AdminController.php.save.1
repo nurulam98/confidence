@@ -105,12 +105,19 @@ return $counts;
 		return redirect()->route('exportCouponMonth')->withErrors(['error' => 'Cek Kembali Tanggal Akhir']);
 		}
 	}
+        if (strlen($request->awal)==7 and $request->akhir == null){
+            $awal = "01-".$request->awal;
+            $date = date("Y-M-d", strtotime($awal));
+            $explode_bln = explode("-",$date);
+            $text = "Reporting Bulan ".$explode_bln[1]." Tahun".$explode_bln[0].".csv";
+        }
 	$text = "";
 	if($akhir == null){
-	$text = "Reporting Data ".date("d-F-Y", strtotime($awal)).".xlsx";
+	$text = "Reporting Data ".date("d-F-Y", strtotime($awal)).".csv";
 	}else{
-	$text = "Reporting Data ".date("d-F-Y",strtotime($awal))." Sampai ".date("d-F-Y", strtotime($akhir)).".xlsx";
+	$text = "Reporting Data ".date("d-F-Y",strtotime($awal))." Sampai ".date("d-F-Y", strtotime($akhir)).".csv";
 	}
+	d
         return Excel::download(new CouponExport($request->awal, $request->akhir), $text);
     }
 
