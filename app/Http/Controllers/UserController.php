@@ -8,7 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-
+use Datatables;
 class UserController extends Controller
 {
     public function __construct()
@@ -18,7 +18,6 @@ class UserController extends Controller
 
     public function index()
     {
-        $coupon = Coupon::where('user_id',Auth::user()->id)->count();
         $points = Points::where('user_id',Auth::user()->id)->first();
         if (strlen($points) == 0){
             $point = 0;
@@ -26,7 +25,7 @@ class UserController extends Controller
         else{
             $point = $points->points;
         }
-        return view('user.dashboard', ['coupon' => $coupon, 'points' => $point]);
+        return view('user.dashboard', ['points' => $point]);
     }
 
     public function profile()
@@ -74,8 +73,11 @@ class UserController extends Controller
 
         $upper = strtoupper($stripped);
         $coupon_get = Coupon::where('coupon',$upper)->first();
+	if($coupon_get == null){
+		return redirect()->route('inputCode')->withErrors(['error' => 'Kupon tidak ditemukan. Silahkan coba kembali']);
+	}
         if ($coupon == $coupon_get->coupon && $coupon_get->status == "Invalid"){
-            return redirect()->route('inputCode')->withErrors(['error' => 'Kupon Sudah Terpakai. Coba Lagi']);
+            return redirect()->route('inputCode')->withErrors(['error' => 'Kupon sudah terpakai. Silahkan coba kembali']);
         }
         else{
             $coupon_get->status = "Invalid";
@@ -96,8 +98,25 @@ class UserController extends Controller
                 $add_point->save();
             }
         }
-        $request->session()->flash('success', "Input Kode Kupon Berhasil");
+        $request->session()->flash('success', "Selamat poin Anda telah bertambah");
         return redirect(route('inputCode'));
+    }
+    public function historyCoupon()
+    {
+        return view('user.historyCoupon');
+    }
+
+    public function historyCouponJson()
+    {
+        $coupon = Coupon::select('coupon','updated_at')->where('user_id',Auth::user()->id)->limit(1000)->get();
+
+        return datatables()->of($coupon)->addColumn('tanggal',function ($row){
+            $tanggal = date_format($row->updated_at,"d-F-Y");
+            return $tanggal;
+        })->rawColumns(['tanggal'])->addColumn('jam',function($row){
+            $jam = date_format($row->updated_at,"H:i:s");
+	    return $jam;
+        })->rawColumns(['jam'])->removeColumn('updated_at')->toJson();
     }
 
 

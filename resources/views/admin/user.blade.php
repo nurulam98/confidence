@@ -14,8 +14,11 @@
                             <th>No</th>
                             <th>Nama Pengguna</th>
                             <th>Email</th>
+			    <th>Kota</th>
                             <th>Username</th>
                             <th>No Handphone</th>
+			    <th>Points Bulan Ini</th>
+			    <th>Points Keseluruhan</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -53,8 +56,11 @@
                     { data: 'DT_RowIndex', name: 'no'},
                     { data: 'name', name: 'name'},
                     { data: 'email', name: 'email'},
+		    { data: 'kota', name: 'kota'},
                     { data: 'username', name: 'username'},
-                    { data: 'no_handphone', name: 'no_handphone'}
+                    { data: 'no_handphone', name: 'no_handphone'},
+		    { data: 'PointMonth', name:'PointMonth'},
+		    { data: 'points', name:'points'}
                 ]
             }).columns.adjust()
             .responsive.recalc();

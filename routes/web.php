@@ -34,6 +34,14 @@ Route::prefix('admin')->group(function(){
     Route::get('exportCouponYear', 'AdminController@exportYear')->name('exportCouponYear');
     Route::post('exportCoupon', 'AdminController@exportPost')->name('exportCouponPost');
 
+    Route::get('coupon', 'AdminController@coupon')->name('couponAdmin');
+    Route::post('couponImport', 'AdminController@couponImport')->name('couponImportAdmin');
+
+    Route::get('searchCoupon','AdminController@searchCoupon')->name('searchCoupon');
+    Route::post('searchCoupon', 'AdminController@searchCouponPost')->name('searchCouponPost');
+
+    Route::get('pointTertinggi', 'AdminController@pointTertinggi')->name('pointTertinggi');
+    Route::post('pointTertinggi', 'AdminController@pointTertinggiPost')->name('pointTertinggiPost');
 
 });
 
@@ -64,4 +72,7 @@ Route::prefix('user')->group(function(){
 
     Route::get('inputCode', 'UserController@inputCode')->name('inputCode');
     Route::post('inputCode', 'UserController@inputCodePost')->name('inputCodePost');
+
+    Route::get('historyCoupon', 'UserController@historyCoupon')->name('historyCoupon');
+    Route::get('historyJson', 'UserController@historyCouponJson');
 });

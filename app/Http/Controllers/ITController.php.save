@@ -113,33 +113,14 @@ class ITController extends Controller
         if ($request->role == "it"){
             $it = 1;
         }
-	
-	if($request->password == null) {
-	$users = User::find($request->User_id);
-	$users->name = $request->name;
-	$users->email = $request->email;
-	$users->username = $request->username;
-	$users->no_handphone = $request->no_handphone;
-	$users->address = $request->address;
-	$users->kota = $request->kota;
-	$users->isUser = $user;
-	$users->isIT = $it;
-	$users->isAdmin = $admin;
-	$users->save();
-	}else{
-	 $users = User::find($request->User_id);
-        $users->name = $request->name;
-        $users->email = $request->email;
-        $users->username = $request->username;
-        $users->no_handphone = $request->no_handphone;
-        $users->address = $request->address;
-        $users->kota = $request->kota;
-        $users->isUser = $user;
-        $users->isIT = $it;
-        $users->isAdmin = $admin;
-	$users->password = Hash::make($request->password);
-	$users->save();
-}
+
+	dd($user);
+        if ($request->password = null){
+            dd(User::updateOrCreate(['id'=> $request->User_id],['name' => $request->name, 'email' => $request->email, 'username' => $request->username, 'no_handphone' => $request->no_handphone, 'isUser' => 0, 'isAdmin' => 0, 'isIT' => 0, 'kota' => $request->kota, 'address' => $request->address]));
+        }
+        else{
+            User::updateOrCreate(['id'=> $request->User_id],['name' => $request->name, 'email' => $request->email, 'username' => $request->username, 'no_handphone' => $request->no_handphone, 'isUser' => $user, 'isAdmin' => $admin, 'isIT' => $it, 'password' => Hash::make($request->password),'kota' => $request->kota, 'address' => $request->address]);
+        }
         return response()->json(['success' => 'User berhasil ditambahkan']);
     }
 

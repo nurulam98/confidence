@@ -6,6 +6,7 @@ use App\Coupon;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
+
 class CouponImport implements ToModel, WithBatchInserts
 {
     /**
@@ -16,10 +17,6 @@ class CouponImport implements ToModel, WithBatchInserts
     public function model(array $row)
     {
         $hasil = explode(";",$row[0]);
-//	$cek = Coupon::where('coupon',$hasil[1])->first();
-//	if($cek){
-//	return null;
-//}
         return new Coupon([
             'coupon' => $hasil[1],
             'status' => $hasil[2],
@@ -28,11 +25,19 @@ class CouponImport implements ToModel, WithBatchInserts
 
     public function batchSize(): int
     {
-        return 500;
+<<<<<<< HEAD
+        return 100;
+=======
+        return 1000;
+>>>>>>> e736df9eb6f2106577a116366bec00127973256f
     }
 
     public function chunkSize(): int
     {
-	return 500;
+<<<<<<< HEAD
+	return 100;
+=======
+        return 1000;
+>>>>>>> e736df9eb6f2106577a116366bec00127973256f
     }
 }

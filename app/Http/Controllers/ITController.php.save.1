@@ -113,33 +113,29 @@ class ITController extends Controller
         if ($request->role == "it"){
             $it = 1;
         }
-	
-	if($request->password == null) {
+	if($request->password == null){
 	$users = User::find($request->User_id);
 	$users->name = $request->name;
 	$users->email = $request->email;
 	$users->username = $request->username;
 	$users->no_handphone = $request->no_handphone;
 	$users->address = $request->address;
-	$users->kota = $request->kota;
-	$users->isUser = $user;
-	$users->isIT = $it;
-	$users->isAdmin = $admin;
-	$users->save();
-	}else{
-	 $users = User::find($request->User_id);
+	$users = User::find($request->User_id);
         $users->name = $request->name;
         $users->email = $request->email;
         $users->username = $request->username;
         $users->no_handphone = $request->no_handphone;
         $users->address = $request->address;
         $users->kota = $request->kota;
-        $users->isUser = $user;
-        $users->isIT = $it;
         $users->isAdmin = $admin;
-	$users->password = Hash::make($request->password);
-	$users->save();
-}
+        $users->isIT = $it;
+        $users->isUser = $user;
+$users->kota = $request->kota;
+	$users->isAdmin = $admin;
+	$users->isIT = $it;
+	$users->isUser = $user;
+	}
+	
         return response()->json(['success' => 'User berhasil ditambahkan']);
     }
 
