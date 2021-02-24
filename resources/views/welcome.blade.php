@@ -19,20 +19,17 @@
     <!-- Navbar -->
     @include('includes.navbarHome')
     <!-- Akhir Navbar -->
-    <div class="content">
-      {{-- Jumbotron --}}
-      <div class="jumbotron jumbotron-fluid">
+      {{-- Jumbotron --}} 
+     <div class="jumbotron">
           <div class="container">
           </div>
-      </div>
-      <div class="container">
-        <div class="content">
-          <a href="https://www.facebook.com/confidenceadultcare/" class="fa fa-facebook"></a><a href="https://www.facebook.com/confidenceadultcare/" class="tulisan">Confidence Adult Diapers</a>
-          <a href="#" class="alamatweb btn btn-link">www.confidence-adultcare.com</a>
-        </div>
-      </div>
-    </div>
+      </div> 
     {{-- Akhir Jumbotron --}}
     <script src="{{ asset('js/app.js') }}"></script>
+<footer class="footer" id="sticky-footer">
+		<div class="container text-center">
+			<span class="text-muted" style="vertical-align: middle; line-height: 60px; margin-right:auto;"><a href="https://www.facebook.com/confidenceadultcare/" class="fa fa-facebook"></a> <a href="https://www.instagram.com/confidenceadultcare/" class="fa fa-instagram" style="margin-left:1%;"></a></span>
+		</div>
+	</footer>
   </body>
 </html>

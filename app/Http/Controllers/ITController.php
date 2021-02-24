@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Coupon;
 use App\Http\Requests\ItUpdate;
 use App\Imports\CouponImport;
+use App\Imports\CouponUsedImport;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -23,9 +24,9 @@ class ITController extends Controller
     public function index(){
         $active = User::where('isDeleted',0)->count();
         $passive = User::where('isDeleted',1)->count();
-        $new = Coupon::where('status','Valid')->count();
+        //$new = Coupon::where('status','Valid')->count();
         $used = Coupon::where('status','Invalid')->count();
-        return view('it.dashboard', ['user' => $active, 'couponNew' => $new, 'couponUsed' => $used]);
+        return view('it.dashboard', ['user' => $active, 'couponUsed' => $used]);
     }
 
     public function profile()
@@ -207,5 +208,27 @@ class ITController extends Controller
         return redirect(route('coupon'));
         
     }
+
+  public function couponUsedImport(Request $request)
+    {
+        $file = $request->file;
+
+        // membuat nama file unik
+        $nama_file = rand().$file->getClientOriginalName();
+
+        // upload ke folder file_siswa di dalam folder public
+        $file->move('file_coupon_used',$nama_file);
+
+        // import data
+        Excel::import(new CouponUsedImport, public_path('/file_coupon_used/'.$nama_file));
+
+        // notifikasi dengan session
+        Session::flash('sukses','Data Coupon Used Berhasil Diimport!');
+
+        // alihkan halaman kembali
+        return redirect(route('coupon'));
+
+    }
+
 
 }

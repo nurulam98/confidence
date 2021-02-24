@@ -22,7 +22,7 @@ class CouponImport implements ToModel, WithBatchInserts
 //}
         return new Coupon([
             'coupon' => $hasil[1],
-            'status' => $hasil[2],
+            'status' => "Valid",
         ]);
     }
 

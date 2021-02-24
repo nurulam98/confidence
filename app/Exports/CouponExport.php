@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
-
 class CouponExport implements FromQuery,WithHeadings
 {
 
@@ -26,7 +25,7 @@ class CouponExport implements FromQuery,WithHeadings
 	$split = explode("-",$this->awal);
 	$date_awal = Carbon::createFromDate($split[2],$split[1],$split[0],$tz);
 	$output2 = User::query()->join('coupon','users.id','=','coupon.user_id')
-->select('users.name','users.no_handphone','users.address','users.kota','coupon.coupon')
+->select(DB::raw('date_format(date(coupon.updated_at),\'%d-%M-%Y\')'),DB::raw('time(coupon.updated_at)'),'users.name','users.no_handphone','users.address','users.kota','coupon.coupon')
 ->whereDate('coupon.updated_at','=',$date_awal);
 	return $output2;
 	}else{
@@ -36,7 +35,7 @@ class CouponExport implements FromQuery,WithHeadings
 	$date_akhir = Carbon::createFromDate($split2[2],$split2[1],$split2[0],$tz);
 
         $output2 = User::query()->join('coupon','users.id','=','coupon.user_id')
-->select('users.name','users.no_handphone','users.address','users.kota','coupon.coupon')
+->select(DB::raw('date_format(date(coupon.updated_at),\'%d-%M-%Y\')'),DB::raw('time(coupon.updated_at)'),'users.name','users.no_handphone','users.address','users.kota','coupon.coupon')
 ->whereDate('coupon.updated_at','>=',$date_awal)->orWhereDate('coupon.updated_at','<=','$date_akhir');
 	return $output2;
 	}
@@ -45,6 +44,6 @@ class CouponExport implements FromQuery,WithHeadings
     public function headings(): array
     {
         // TODO: Implement headings() method.
-        return ["Nama Pengguna", "Nomor Handphone", "Alamat", "Kota", "Kode Kupon"];
+        return ["Tanggal","Jam","Nama Pengguna", "Nomor Handphone", "Alamat", "Kota", "Kode Kupon"];
     }
 }

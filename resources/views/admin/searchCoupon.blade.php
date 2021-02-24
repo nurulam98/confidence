@@ -46,7 +46,7 @@
   				   <tr>
     					<td>{{ $coupon->coupon }}</td>
     					<td>{{ $coupon->name == null ? "-" : $coupon->name }}</td>
-    					<td>{{ $coupon->status }}</td>
+    					<td>{{ $coupon->status == "Valid" ? "Available" : "Unavailable" }}</td>
 					<td>{{ $coupon->updated_at }}</td>
 				  </tr>
 				@endforeach

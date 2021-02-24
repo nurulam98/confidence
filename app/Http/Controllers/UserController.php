@@ -18,12 +18,12 @@ class UserController extends Controller
 
     public function index()
     {
-        $points = Points::where('user_id',Auth::user()->id)->first();
+        $points = Coupon::where('user_id',Auth::user()->id)->count();
         if (strlen($points) == 0){
             $point = 0;
         }
         else{
-            $point = $points->points;
+            $point = $points;
         }
         return view('user.dashboard', ['points' => $point]);
     }
@@ -98,7 +98,7 @@ class UserController extends Controller
                 $add_point->save();
             }
         }
-        $request->session()->flash('success', "Selamat poin Anda telah bertambah");
+        $request->session()->flash('success', "Selamat, Kupon anda berhasil terpakai");
         return redirect(route('inputCode'));
     }
     public function historyCoupon()

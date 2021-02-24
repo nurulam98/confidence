@@ -131,7 +131,7 @@ return $counts;
         Excel::import(new CouponImport, public_path('/file_coupon/'.$nama_file));
 
         // notifikasi dengan session
-        Session::flash('sukses','Data Coupon Berhasil Diimport!');
+        Session::flash('sukses','Data Coupon '.$file->getClientOriginalName().' Berhasil Diimport!');
 
 //	$destination_file = "/var/www/confidence/public/file_coupon/";
 
