@@ -1,4 +1,3 @@
-<!-- <div class="fullgambar"> -->
 <nav class="navbar navbar-expand-lg navbar-light">
 <div class="container" style="margin-top: -10px;">
         <a class="navbar-brand" href="#"><img src="{{ asset('assets/img/logo.png')}}" alt=""></a>
@@ -6,7 +5,7 @@
         <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav ml-auto">
+        <div class="navbar-nav mx-auto">
             <a class="nav-item btn btn-primary tombol {{ (\Request::route()->getName() == 'homepage') ? 'active' : ''}}" href="{{ route('homepage')}}">Home</a>
 
             @if (Auth::check())
