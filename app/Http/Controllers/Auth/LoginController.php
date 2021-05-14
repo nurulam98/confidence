@@ -107,7 +107,7 @@ class LoginController extends Controller
             'email' => $user->email,
             'username' => $user->id,
             'password' => Hash::make('qwertynum123'),
-	    'no_handphone' => str_pad(mt_rand(1,99999999),8,'0',STR_PAD_LEFT),
+	    'no_handphone' => str_pad(random_int(1,99999999),8,'0',STR_PAD_LEFT),
 	    'address'=> 'jakarta',
 	    'kota'=> 'jakarta',
 	    'email_verified_at' => Carbon::now()->format('Y-m-d H:i:s'),

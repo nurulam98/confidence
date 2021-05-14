@@ -123,7 +123,7 @@ return $counts;
         $file = $request->file;
 
         // membuat nama file unik
-        $nama_file = rand().".".$file->getClientOriginalExtension();
+        $nama_file = bin2hex(random_bytes(5)).".".$file->getClientOriginalExtension();
         // upload ke folder file_siswa di dalam folder public
         $file->move('file_coupon',$nama_file);
 

@@ -193,7 +193,7 @@ class ITController extends Controller
         $file = $request->file;
 
         // membuat nama file unik
-        $nama_file = rand().$file->getClientOriginalName();
+        $nama_file = bin2hex(random_bytes(5)).$file->getClientOriginalName();
 
         // upload ke folder file_siswa di dalam folder public
         $file->move('file_coupon',$nama_file);
@@ -214,7 +214,7 @@ class ITController extends Controller
         $file = $request->file;
 
         // membuat nama file unik
-        $nama_file = rand().$file->getClientOriginalName();
+        $nama_file = bin2hex(random_bytes(5)).$file->getClientOriginalName();
 
         // upload ke folder file_siswa di dalam folder public
         $file->move('file_coupon_used',$nama_file);
