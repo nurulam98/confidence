@@ -68,6 +68,8 @@ class LoginController extends Controller
             return redirect()->route('dashboard');
         }else{
 	    //return redirect()->route('login')->withErrors(['error' => 'Email Address atau Username dan Password Salah']);
+            $expires = time() + 60 * 60 * 2;
+            Session::put('cookies_expires',$expires);
 	return redirect()->route('login')->withErrors(['errors' => 'Email Address / Username / No. Handphone dan Password Salah']);
 	}
     }
