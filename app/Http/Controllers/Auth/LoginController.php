@@ -56,6 +56,6 @@ class LoginController extends Controller
             return redirect()->route('dashboard');
         }
 
-        return redirect()->route('login')->with('error','Email/Password Salah');
+        return redirect()->route('login')->withErrors(['error' => 'Kupon Sudah Terpakai. Coba Lagi']);;
     }
 }
