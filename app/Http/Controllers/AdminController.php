@@ -1,8 +1,8 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Coupon;
+use App\Points;
 use App\Exports\CouponExport;
 use App\Http\Requests\AdminUpdate;
 use App\User;
@@ -11,6 +11,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Excel;
 use Yajra\DataTables\DataTables;
+use Carbon\Carbon;
+use App\Imports\CouponImport;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\File;
+use DB;
 
 class AdminController extends Controller
 {
@@ -21,9 +26,12 @@ class AdminController extends Controller
     }
 
     public function index(){
+	$now = Carbon::now();
         $user = User::whereNotNull('email_verified_at')->where('isUser','=',1)->where('isDeleted',0)->count();
+	$userMonth = User::whereNotNull('email_verified_at')->where('isUser',1)->where('isDeleted',0)->whereMonth('updated_at',$now->month)->count();
         $coupon = Coupon::where('status','Invalid')->count();
-        return view('admin.dashboard',['user' => $user, 'coupon' => $coupon]);
+	$couponMonth = Coupon::where('status','Invalid')->whereMonth('updated_at',$now->month)->count();
+        return view('admin.dashboard',['user' => $user, 'coupon' => $coupon, 'userMonth' => $userMonth, 'couponMonth' => $couponMonth]);
     }
 
     public function profile()
@@ -57,8 +65,17 @@ class AdminController extends Controller
 
     public function json()
     {
-        $user = User::select('name','email','username','no_handphone')->whereNotNull('email_verified_at')->where('isUser','=', 1)->where('isDeleted',0)->get();
-        return datatables()->of($user)->addIndexColumn()->toJson();
+        $user = User::leftjoin('points','users.id','=','points.user_id')
+->select('users.id','users.name','users.email','users.username','users.kota','users.no_handphone','points.points')
+->whereNotNull('users.email_verified_at')
+->where('users.isUser','=', 1)
+->where('users.isDeleted',0)->get();
+        return datatables()->of($user)->addIndexColumn()
+->addColumn('PointMonth', function ($row){
+$nows = Carbon::now();
+$counts = Coupon::where('user_id',$row->id)->whereMonth('updated_at',$nows->month)->count();
+return $counts;
+})->toJson();
     }
     public function user()
     {
@@ -76,28 +93,81 @@ class AdminController extends Controller
     }
 
     public function exportPost(Request $request){
-        if (strlen($request->awal)==7 and $request->akhir == null){
-            $awal = "01-".$request->awal;
-            $date = date("Y-M-d", strtotime($awal));
-            $explode_bln = explode("-",$date);
-            $text = "Reporting Bulan ".$explode_bln[1]." Tahun".$explode_bln[0].".csv";
-        }
-        if (strlen($request->awal)==7 && strlen($request->akhir) ==7){
-            $awal = "01-".$request->awal;
-            $date = date("Y-M-d", strtotime($awal));
-            $explode_bln = explode("-",$date);
-            $akhir = "01-".$request->akhir;
-            $dates = date("Y-M-d", strtotime($akhir));
-            $explode_bln1 = explode("-",$dates);
-            $text = "Reporting Bulan ".$explode_bln[1]." & ".$explode_bln1[1]." ".$explode_bln[0].".csv";
-        }
-        if (strlen($request->awal)==7 && $request->akhir == null){
-            $text = "Reporting Tahun ".$request->awal.".csv";
-        }
-        if (strlen($request->awal)==7 && $request->akhir != null){
-            $text = "Reporting Tahun ".$request->awal." & ".$request->akhir.".csv";
-        }
+	//dd($request);
+	$awal = $request->awal;
+	$akhir = $request->akhir;
+	if($awal == null){
+	  return redirect()->route('exportCouponMonth')->withErrors(['error' => 'Tanggal Awal Harus Diiisi']);
+	}
+	if($akhir != null)
+	{
+		if(strtotime($awal) > strtotime($akhir)){
+		return redirect()->route('exportCouponMonth')->withErrors(['error' => 'Cek Kembali Tanggal Akhir']);
+		}
+	}
+	$text = "";
+	if($akhir == null){
+	$text = "Reporting Data ".date("d-F-Y", strtotime($awal)).".xlsx";
+	}else{
+	$text = "Reporting Data ".date("d-F-Y",strtotime($awal))." Sampai ".date("d-F-Y", strtotime($akhir)).".xlsx";
+	}
         return Excel::download(new CouponExport($request->awal, $request->akhir), $text);
     }
 
+    public function coupon(){
+        return view('admin.coupon');
+    }
+
+    public function couponImport(Request $request)
+    {
+        $file = $request->file;
+
+        // membuat nama file unik
+        $nama_file = bin2hex(random_bytes(5)).".".$file->getClientOriginalExtension();
+        // upload ke folder file_siswa di dalam folder public
+        $file->move('file_coupon',$nama_file);
+
+        // import data
+        Excel::import(new CouponImport, public_path('/file_coupon/'.$nama_file));
+
+        // notifikasi dengan session
+        Session::flash('sukses','Data Coupon '.$file->getClientOriginalName().' Berhasil Diimport!');
+
+//	$destination_file = "/var/www/confidence/public/file_coupon/";
+
+//	File::delete($destination_file.$namafile);
+
+        // alihkan halaman kembali
+        return redirect(route('couponAdmin'));
+        
+    }
+
+    public function searchCoupon()
+    {
+	$coupons = 0;
+	return view('admin.searchCoupon', compact("coupons"));
+    }
+
+    public function searchCouponPost(Request $request)
+    {
+	$coupon = $request->coupon;
+	$coupons = Coupon::leftjoin('users','coupon.user_id','=','users.id')
+->select('coupon.coupon','users.name','coupon.status', 'coupon.updated_at')->where('coupon.coupon',$coupon)->get();
+	return view('admin.searchCoupon', compact("coupons"));
+    }
+
+    public function pointTertinggi()
+    {
+	$points = 0;
+	return view('admin.pointTertinggi', ['points' => $points, 'bulan' => 0, 'tahun'=> 0]);
+    }
+
+    public function pointTertinggiPost(Request $request)
+    {
+	$bulan = $request->bulan;
+	$tahun = $request->tahun;
+	$points = Coupon::leftjoin('users','coupon.user_id','=','users.id')->select('users.name',DB::raw('count(coupon.coupon) as jumlah'))->groupBy('coupon.user_id')->groupBy('users.name')->whereNotNull('coupon.user_id')->whereMonth('coupon.updated_at',$bulan)->whereYear('coupon.updated_at',$tahun)->orderBy('jumlah','desc')->limit(10)->get();
+	$bulan_convert = date("F", mktime(0,0,0, $bulan,10));
+	return view('admin.pointTertinggi', ['points' => $points, 'bulan'=> $bulan_convert, 'tahun' => $tahun]);
+    }
 }

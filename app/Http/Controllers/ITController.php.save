@@ -1,0 +1,192 @@
+<?php
+namespace App\Http\Controllers;
+
+use App\Coupon;
+use App\Http\Requests\ItUpdate;
+use App\Imports\CouponImport;
+use App\User;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
+use Datatables;
+use Maatwebsite\Excel\Facades\Excel;
+
+class ITController extends Controller
+{
+    public function __construct()
+    {
+        $this->middleware('checkRole:isIT');
+    }
+
+    public function index(){
+        $active = User::where('isDeleted',0)->count();
+        $passive = User::where('isDeleted',1)->count();
+        $new = Coupon::where('status','Valid')->count();
+        $used = Coupon::where('status','Invalid')->count();
+        return view('it.dashboard', ['user' => $active, 'couponNew' => $new, 'couponUsed' => $used]);
+    }
+
+    public function profile()
+    {
+        return view('it.profile');
+    }
+
+    public function profilePost(ItUpdate $request)
+    {
+        $user = Auth::user();
+        if (!(Hash::check($request['password'], Auth::user()->password))) {
+            return redirect()->back()->withErrors(["Password Sekarang anda tidak cocok dengan database. Silahkan coba lagi"]);
+        }
+
+        if (strcmp($request['password'], $request['new_password']) == 0) {
+            return redirect()->back()->withErrors(["Password baru tidak boleh sama dengan password sekarang. Silahkan masukan password"]);
+        }
+        if (!(strcmp($request['new_password'], $request['new_password_confirmation'])) == 0) {
+            return redirect()->back()->withErrors(["Konfirmasi Password dengan Password baru tidak sama. Silakan coba lagi"]);
+        }
+        $user->name = $request['name'];
+        $user->username = $request['username'];
+        $user->email = $request['email'];
+        $user->no_handphone = $request['no_handphone'];
+        $user->password = Hash::make($request['new_password']);
+        $user->save();
+
+        $request->session()->flash('success', "Kupon Berhasil Ditambahkan");
+        return back();
+    }
+
+    public function userJson(){
+        $user = User::select('id','name','email','username','no_handphone','isUser','isAdmin','isIT','email_verified_at','kota','address')->where('isDeleted',0)->get();
+        return datatables()->of($user)
+            ->addIndexColumn()
+            ->addColumn('role', function ($row){
+            if ($row->isUser == 1){
+                $role = "User";
+            }
+            if ($row->isAdmin == 1){
+                $role = "Admin";
+            }
+            if ($row->isIT == 1){
+                $role = "IT";
+            }
+            return $role;
+        })->addColumn('status', function ($row){
+            if (strlen($row->email_verified_at) != 0){
+                $status = "Verified";
+            }
+            if (strlen($row->email_verified_at) == 0){
+                $status = "Not Verified";
+            }
+                return $status;
+            })
+            ->addColumn('action', function ($row){
+            $btn = '<a href="javascript:void(0)" data-toggle="tooltip"  data-id="'.$row->id.'" data-original-title="Edit" class="edit btn btn-primary btn-sm editUser">Edit</a>';
+
+            $btn = $btn.' <a href="javascript:void(0)" data-toggle="tooltip"  data-id="'.$row->id.'" data-original-title="Delete" class="btn btn-danger btn-sm deleteUser">Delete</a>';
+
+            if (strlen($row->email_verified_at) == 0){
+                $btn = $btn.' <a href="javascript:void(0)" data-toggle="tooltip"  data-id="'.$row->id.'" data-original-title="Verified" class="btn btn-success btn-sm confirmUser">Confirm Email</a>';
+            }
+            return $btn;
+        })->rawColumns(['action'])
+            ->removeColumn('isUser','isAdmin','isIT','email_verified_at')
+            ->toJson();
+    }
+
+    public function user(){
+        return view('it.user');
+    }
+
+    public function addUser(Request $request){
+        $user = 0;
+	$admin = 0;
+	$it = 0;
+	
+	if ($request->role == "admin"){
+            $admin = 1;
+        }
+        if ($request->role == "user"){
+            $user = 1;
+        }
+        if ($request->role == "it"){
+            $it = 1;
+        }
+
+	dd($user);
+        if ($request->password = null){
+            dd(User::updateOrCreate(['id'=> $request->User_id],['name' => $request->name, 'email' => $request->email, 'username' => $request->username, 'no_handphone' => $request->no_handphone, 'isUser' => 0, 'isAdmin' => 0, 'isIT' => 0, 'kota' => $request->kota, 'address' => $request->address]));
+        }
+        else{
+            User::updateOrCreate(['id'=> $request->User_id],['name' => $request->name, 'email' => $request->email, 'username' => $request->username, 'no_handphone' => $request->no_handphone, 'isUser' => $user, 'isAdmin' => $admin, 'isIT' => $it, 'password' => Hash::make($request->password),'kota' => $request->kota, 'address' => $request->address]);
+        }
+        return response()->json(['success' => 'User berhasil ditambahkan']);
+    }
+
+    public function edit($id){
+        $user = User::find($id);
+        if ($user->isUser == 1){
+            $user['role'] = "user";
+        }
+        if ($user->isAdmin == 1){
+            $user['role'] = "admin";
+        }
+        if ($user->isIT == 1){
+            $user['role'] = "it";
+        }
+        unset($user['isAdmin'],$user['isUser'],$user['isIT'],$user['email_verified_at'],$user['updated_at'], $user['created_at']);
+        return response()->json($user);
+    }
+
+    public function delete($id){
+        $user = User::find($id);
+        $user->isDeleted = 1;
+        $user->save();
+
+        return response()->json(['success' => 'User Deleted']);
+    }
+
+    public function confirm($id){
+        $user = User::find($id);
+        $user->email_verified_at = Carbon::now()->format('Y-m-d H:i:s');
+        $user->save();
+
+        return response()->json(['success' => 'Konfirmasi Email Berhasil']);
+    }
+
+    public function couponJson(){
+        $coupon = Coupon::select('coupon', 'status','user_id','created_at')->limit(4000)->get();
+
+        return datatables()->of($coupon)->addColumn('tanggal',function ($row){
+            $tanggal = date_format($row->created_at,"d-m-Y");
+            return $tanggal;
+        })->rawColumns(['tanggal'])->removeColumn('created_at')->toJson();
+
+    }
+    public function coupon(){
+        return view('it.coupon');
+    }
+
+    public function couponImport(Request $request)
+    {
+        $file = $request->file;
+
+        // membuat nama file unik
+        $nama_file = rand().$file->getClientOriginalName();
+
+        // upload ke folder file_siswa di dalam folder public
+        $file->move('file_coupon',$nama_file);
+
+        // import data
+        Excel::import(new CouponImport, public_path('/file_coupon/'.$nama_file));
+
+        // notifikasi dengan session
+        Session::flash('sukses','Data Coupon Berhasil Diimport!');
+
+        // alihkan halaman kembali
+        return redirect(route('coupon'));
+        
+    }
+
+}

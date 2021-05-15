@@ -1,10 +1,10 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Coupon;
 use App\Http\Requests\ItUpdate;
 use App\Imports\CouponImport;
+use App\Imports\CouponUsedImport;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -24,9 +24,9 @@ class ITController extends Controller
     public function index(){
         $active = User::where('isDeleted',0)->count();
         $passive = User::where('isDeleted',1)->count();
-        $new = Coupon::where('status','new')->count();
-        $used = Coupon::where('status','used')->count();
-        return view('it.dashboard', ['user' => $active, 'couponNew' => $new, 'couponUsed' => $used]);
+        //$new = Coupon::where('status','Valid')->count();
+        $used = Coupon::where('status','Invalid')->count();
+        return view('it.dashboard', ['user' => $active, 'couponUsed' => $used]);
     }
 
     public function profile()
@@ -101,29 +101,46 @@ class ITController extends Controller
     }
 
     public function addUser(Request $request){
-        if ($request->role == "admin"){
-            $user = 0;
+        $user = 0;
+	$admin = 0;
+	$it = 0;
+	
+	if ($request->role == "admin"){
             $admin = 1;
-            $it = 0;
         }
         if ($request->role == "user"){
             $user = 1;
-            $admin = 0;
-            $it = 0;
         }
         if ($request->role == "it"){
-            $user = 0;
-            $admin = 0;
             $it = 1;
         }
-
-
-        if ($request->password == ""){
-            User::updateOrCreate(['id'=> $request->User_id],['name' => $request->name, 'email' => $request->email, 'username' => $request->username, 'no_handphone' => $request->no_handphone, 'isUser' => $user, 'isAdmin' => $admin, 'isIT' => $it, 'kota' => $request->kota, 'address' => $request->address]);
-        }
-        else{
-            User::updateOrCreate(['id'=> $request->User_id],['name' => $request->name, 'email' => $request->email, 'username' => $request->username, 'no_handphone' => $request->no_handphone, 'isUser' => $user, 'isAdmin' => $admin, 'isIT' => $it, 'password' => Hash::make($request->password),'kota' => $request->kota, 'address' => $request->address]);
-        }
+	
+	if($request->password == null) {
+	$users = User::find($request->User_id);
+	$users->name = $request->name;
+	$users->email = $request->email;
+	$users->username = $request->username;
+	$users->no_handphone = $request->no_handphone;
+	$users->address = $request->address;
+	$users->kota = $request->kota;
+	$users->isUser = $user;
+	$users->isIT = $it;
+	$users->isAdmin = $admin;
+	$users->save();
+	}else{
+	 $users = User::find($request->User_id);
+        $users->name = $request->name;
+        $users->email = $request->email;
+        $users->username = $request->username;
+        $users->no_handphone = $request->no_handphone;
+        $users->address = $request->address;
+        $users->kota = $request->kota;
+        $users->isUser = $user;
+        $users->isIT = $it;
+        $users->isAdmin = $admin;
+	$users->password = Hash::make($request->password);
+	$users->save();
+}
         return response()->json(['success' => 'User berhasil ditambahkan']);
     }
 
@@ -159,7 +176,7 @@ class ITController extends Controller
     }
 
     public function couponJson(){
-        $coupon = Coupon::select('coupon', 'status','user_id','created_at')->limit(1000)->get();
+        $coupon = Coupon::select('coupon', 'status','user_id','created_at')->limit(4000)->get();
 
         return datatables()->of($coupon)->addColumn('tanggal',function ($row){
             $tanggal = date_format($row->created_at,"d-m-Y");
@@ -176,7 +193,7 @@ class ITController extends Controller
         $file = $request->file;
 
         // membuat nama file unik
-        $nama_file = rand().$file->getClientOriginalName();
+        $nama_file = bin2hex(random_bytes(5)).$file->getClientOriginalName();
 
         // upload ke folder file_siswa di dalam folder public
         $file->move('file_coupon',$nama_file);
@@ -191,5 +208,27 @@ class ITController extends Controller
         return redirect(route('coupon'));
         
     }
+
+  public function couponUsedImport(Request $request)
+    {
+        $file = $request->file;
+
+        // membuat nama file unik
+        $nama_file = bin2hex(random_bytes(5)).$file->getClientOriginalName();
+
+        // upload ke folder file_siswa di dalam folder public
+        $file->move('file_coupon_used',$nama_file);
+
+        // import data
+        Excel::import(new CouponUsedImport, public_path('/file_coupon_used/'.$nama_file));
+
+        // notifikasi dengan session
+        Session::flash('sukses','Data Coupon Used Berhasil Diimport!');
+
+        // alihkan halaman kembali
+        return redirect(route('coupon'));
+
+    }
+
 
 }

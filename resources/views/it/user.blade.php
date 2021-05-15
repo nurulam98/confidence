@@ -21,8 +21,8 @@
                                 <th>Status</th>
                                 <th>Alamat</th>
                                 <th>Kota</th>
-                                <th>Action</th>
                                 <th>No Handphone</th>
+				<th>Action</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -146,8 +146,8 @@
                     { data: 'status', name: 'status'},
                     { data: 'address', name: 'address'},
                     { data: 'kota', name: 'kota'},
-                    { data: 'action', name: 'action', orderable:false, searchable:false},
                     { data: 'no_handphone', name: 'no_handphone'},
+		    { data: 'action', name: 'action', orderable:false, searchable:false},
                 ]
             }).columns.adjust()
                 .responsive.recalc();

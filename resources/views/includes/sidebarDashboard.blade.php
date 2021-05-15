@@ -14,6 +14,11 @@
                         <i class="icon icon-pencil"></i> Input Kode Kupon
                     </a>
                 </li>
+		<li class="nav-item">
+                    <a href="{{ route('historyCoupon') }}" class="nav-link {{ (\Request::route()->getName() == 'historyCoupon') ? 'active' : ''}}">
+                        <i class="icon icon-book-open"></i> History Coupon Terpakai
+                    </a>
+                </li>
             @endif
 
             @if (Auth::user()->isAdmin == true)
@@ -32,6 +37,24 @@
                         <i class="icon icon-notebook"></i> Report Data
                     </a>
                 </li>
+		 <li class="nav-item">
+                    <a href="{{ route('couponAdmin') }}" class="nav-link {{ (\Request::route()->getName() == 'couponAdmin') ? 'active' : ''}} ">
+                        <i class="icon icon-cloud-upload"></i> Coupon Import
+                    </a>
+                </li>
+		<li class="nav-item">
+                    <a href="{{ route('searchCoupon') }}" class="nav-link {{ (\Request::route()->getName() == 'searchCoupon') ? 'active' : ''}} ">
+                        <i class="icon icon-magnifier"></i> Search Coupon
+                    </a>
+                </li>
+
+		<li class="nav-item">
+                    <a href="{{ route('pointTertinggi') }}" class="nav-link {{ (\Request::route()->getName() == 'PointTertinggi') ? 'active' : ''}} ">
+                        <i class="icon icon-badge"></i> Point Tertinggi
+                    </a>
+                </li>
+
+
             @endif
 
             @if (Auth::user()->isIT == true)

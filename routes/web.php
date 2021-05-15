@@ -20,6 +20,10 @@ Route::get('/', 'PublicController@index')->name('homepage');
 
 Auth::routes(['verify' => true]);
 
+Route::get('auth/{provider}', 'Auth\LoginController@redirectToProvider');
+Route::get('auth/{provider}/callback', 'Auth\LoginController@handleProviderCallback');
+Route::post('deletion/facebook/{id}','FacebookController@deleteCallback');
+Route::get('privacy','FacebookController@policyPrivacy')->name('privacyPolicy');
 Route::get('/home', 'HomeController@index')->name('dashboard');
 
 Route::prefix('admin')->group(function(){
@@ -34,6 +38,14 @@ Route::prefix('admin')->group(function(){
     Route::get('exportCouponYear', 'AdminController@exportYear')->name('exportCouponYear');
     Route::post('exportCoupon', 'AdminController@exportPost')->name('exportCouponPost');
 
+    Route::get('coupon', 'AdminController@coupon')->name('couponAdmin');
+    Route::post('couponImport', 'AdminController@couponImport')->name('couponImportAdmin');
+
+    Route::get('searchCoupon','AdminController@searchCoupon')->name('searchCoupon');
+    Route::post('searchCoupon', 'AdminController@searchCouponPost')->name('searchCouponPost');
+
+    Route::get('pointTertinggi', 'AdminController@pointTertinggi')->name('pointTertinggi');
+    Route::post('pointTertinggi', 'AdminController@pointTertinggiPost')->name('pointTertinggiPost');
 
 });
 
@@ -54,6 +66,7 @@ Route::prefix('it')->group(function(){
     Route::get('coupon', 'ITController@coupon')->name('coupon');
     Route::get('couponJson', 'ITController@couponJson');
     Route::post('couponImport', 'ITController@couponImport')->name('couponImport');
+    Route::post('couponUsedImport','ITController@couponUsedImport')->name('couponUsedImport');
 });
 
 Route::prefix('user')->group(function(){
@@ -64,4 +77,7 @@ Route::prefix('user')->group(function(){
 
     Route::get('inputCode', 'UserController@inputCode')->name('inputCode');
     Route::post('inputCode', 'UserController@inputCodePost')->name('inputCodePost');
+
+    Route::get('historyCoupon', 'UserController@historyCoupon')->name('historyCoupon');
+    Route::get('historyJson', 'UserController@historyCouponJson');
 });
