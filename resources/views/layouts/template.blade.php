@@ -11,9 +11,9 @@
     <link rel="stylesheet" href="{{ asset('assets/css/styles.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/custom.css') }}">
 
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.18/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.5/css/responsive.bootstrap4.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker3.css"/>
+    <link rel="stylesheet" href="{{ asset('css/jquery.dataTables.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/responsive.bootstrap4.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/bootstrap-datepicker3.css') }}"/>
 {{--    <link rel="stylesheet" href="{{ asset('css/style.css') }}">--}}
 
 </head>

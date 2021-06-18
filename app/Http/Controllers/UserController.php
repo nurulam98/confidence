@@ -119,22 +119,5 @@ class UserController extends Controller
         })->rawColumns(['jam'])->removeColumn('updated_at')->toJson();
     }
 
-    public function historyCoupon()
-    {
-        return view('user.historyCoupon');
-    }
-
-    public function historyCouponJson()
-    {
-        $coupon = Coupon::select('coupon', 'status','updated_at')->limit(1000)->get();
-
-        return datatables()->of($coupon)->addColumn('tanggal',function ($row){
-            $tanggal = date_format($row->created_at,"d-m-Y");
-            return $tanggal;
-        })->rawColumns(['tanggal'])->addColumn('jam',function($row){
-            $jam = date_format($row->created_at,"H:i:s");
-        })->removeColumn('created_at')->toJson();
-    }
-
 
 }

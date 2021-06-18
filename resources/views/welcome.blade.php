@@ -9,8 +9,7 @@
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     <!-- Font -->
     <link href="{{ asset('css/fontViga.css') }}" rel="stylesheet">
-    <link rel="stylesheet" href="{{asset('assets/vendor/font-awesome/css/fontawesome-all.css')}}">
-    <link rel="stylesheet" href="{{asset('assets/vendor/font-awesome/css/fa-regular.css')}}">
+    <link rel="stylesheet" href="{{asset('assets/vendor/font-awesome/css/font-awesome.min.css')}}">
     <!-- Custom Css -->
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
 
