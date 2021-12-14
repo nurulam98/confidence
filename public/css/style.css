@@ -80,6 +80,9 @@ pointer-events: none;
 #sticky-footer {
   flex-shrink: none;
 }
+p{
+ font-size: 16px !important;
+}
 /* Desktop Version */
 @media (min-width: 992px){
     .navbar-brand, .nav-link {
